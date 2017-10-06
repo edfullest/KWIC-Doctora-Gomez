@@ -8,14 +8,46 @@
  */
 
  #include <bits/stdc++.h>
+ #define CARRIAGE_RETURN char(13)
  #define FOR(i, a, b) for(int i=int(a); i<int(b); i++)
+
+
+
  using namespace std;
  
+ /** SortOrder
+ 
+  This enum is used by the sorting functionality to sort depending on the
+  specification. ASC for ascending sort order, and DESC for descending sort order.
+
+ **/
  enum SortOrder{
 		 ASC,
 		 DESC
  };
  
+void vReadFromFile(string sFileName, vector<string> &vsLines){
+	ifstream file(sFileName);
+	string sLine;
+	string sNewLine;
+	while(getline(file, sLine, CARRIAGE_RETURN)) {
+		std::stringstream ssStream(sLine);
+		ssStream >> ws; // Eliminates white spaces at the end of the string
+		getline(ssStream,sNewLine); // The new line will have the filtered string without carriage returns/white spaces at the end
+		vsLines.push_back(sNewLine);
+	}
+	file.close();
+}
+
+void vSaveToFile(string sFileName, vector<string> &vsAnswer){
+	ofstream fileOutput(sFileName);
+	// Outputs solution
+	 FOR(i, 0, vsAnswer.size()){
+			 fileOutput << vsAnswer[i] << endl;
+	 }
+	 fileOutput.close();
+}
+
  /**
 	sProcessLine
 	Method called every time the program finds new line in the input
@@ -72,6 +104,17 @@
 				 answer.push_back(sLine);
 		 }
  }
+
+ /**
+		 vPrintWithIndex
+		 Print a strings array with a 1-based index prefix
+	*/
+ void vPrintWithIndex(vector<string> &vsToPrint) {
+		 FOR(i, 0, vsToPrint.size()) {
+				 cout << i + 1 << ".- " << vsToPrint[i] << endl;
+		 }
+ }
+
  /** 
 	 vSort 
  	Method that sorts depending on the specification. It can be descending or ascending order.
@@ -89,37 +132,77 @@ void vSort(vector<string> &vsWords, SortOrder soOrder){
 	}
 }
 
+void vRemoveBreakWords(vector<string> &vsWords, vector<string> &vsBreakWords){
+	vector<string> *vsFilteredWords = new vector<string>();
+	bool bIsWordABreakWord = false;
+	FOR(i, 0, vsWords.size()){
+
+		FOR(j, 0, vsBreakWords.size()){
+			bIsWordABreakWord = vsWords[i] == vsBreakWords[j];
+			if (bIsWordABreakWord){
+				break;
+			}
+		}
+
+		if (!bIsWordABreakWord){
+			vsFilteredWords -> push_back(vsWords[i]);
+		}
+	}
+
+	vsWords.swap(*vsFilteredWords);
+	delete vsFilteredWords;
+}
+
 /**
-
-
 	vProcessWords
-	Method that generates the permutations from a list of words
-	
+	Method that 
+	1. Processes the lines to make them lower case
+	2. Breaks the line into vector of single words
+	3. Removes the stop words from each line
+	4. Generates the permutation
+	.generates the permutations from a list of words
 
 	@param vsWords passed by reference, the vector of words that will be permuted
 	@param vsPermutations passed by reference, the vector with the permutations
+	@param vsStopWords passed by reference, the vector with the stop words
 */
-void vProcessWords(vector<string> &vsWords, vector<string> &vsPermutations){
+void vProcessWords(vector<string> &vsWords, vector<string> &vsPermutations,
+				   vector<string> &vsStopWords){
 	FOR(i, 0, vsWords.size()){
 		string sNewLine = sProcessLine(vsWords[i]);
 		vector<string> vsBrokenWords = vsBreakALine(sNewLine);
+
+		vRemoveBreakWords(vsBrokenWords, vsStopWords);
 		vGenerateAnswer(vsBrokenWords, vsPermutations);
 	}
 }
 
- /**
-		 vPrintWithIndex
-		 Print a strings array with a 1-based index prefix
-	*/
- void vPrintWithIndex(vector<string> vsToPrint) {
-		 FOR(i, 0, vsToPrint.size()) {
-				 cout << i + 1 << ".- " << vsToPrint[i] << endl;
-		 }
- }
+void vRemoveLines(vector<string> &vsWords, vector<int> &viLinesToRemove){
+	if (viLinesToRemove.empty()){
+		return;
+	}
+	else{
+		vector<string> *vsFilteredLines = new vector<string>();
+		sort(viLinesToRemove.begin(), viLinesToRemove.end());
+		vector<int>::iterator itNextToRemove = viLinesToRemove.begin();
+		FOR(i, 0, vsWords.size()){
+			if (i == *itNextToRemove){
+				++itNextToRemove;
+			}
+			else{
+				vsFilteredLines -> push_back(vsWords[i]);
+			}
+		}
+		vsWords.swap(*vsFilteredLines);
+		vPrintWithIndex(vsWords);
+		delete vsFilteredLines;
+	}	
+}
+
  
  /**
 		 vRemoveLinesInMenu
-		 Reads in GIU all lines to remove
+		 Reads in GUI the indexes from the lines to remove
  
 		 @return 
  */
@@ -139,20 +222,23 @@ void vProcessWords(vector<string> &vsWords, vector<string> &vsPermutations){
 		 return viLinesToRemove;
  }
  
+
+
  /**
 		 vMenu
 		 Method to print the initial menu
 		 
 		 @param vsOriginalLines Vector of original sentences from file
-		 @param vsAnswer Vector to store answer
+		 @param vsStopWords vector passed by reference of stop words
+		 @param vsAnswer vector passed by reference to store answer
 	*/
- void vMenu(vector<string> vsOriginalLines, vector<string>& vsAnswer) {
+ void vMenu(vector<string> vsOriginalLines, vector<string> &vsStopWords ,vector<string>& vsAnswer) {
 		 char cOption;
 		 vector<string> vsCurrArr = vsOriginalLines;
 		 vector<int> viLinesToRemove;
 		 do {
 				 cout << "Welcome to the KWIC. This is our menu" << endl;
-				 cout << "1. Remove words from input" << endl;
+				 cout << "1. Remove lines from input" << endl;
 				 cout << "2. Sort ascending" << endl;
 				 cout << "3. Sort descending" << endl;
 				 cout << "4. Reset input to original file" << endl;
@@ -160,7 +246,7 @@ void vProcessWords(vector<string> &vsWords, vector<string> &vsPermutations){
  
 				 // Validate menu option
 				 do {
-						 cout << "Please the a valid option number" << endl;
+						 cout << "Please enter a valid option number" << endl;
 						 cin >> cOption;
 				 } while(cOption < '1' || cOption > '5');
 				 
@@ -168,20 +254,24 @@ void vProcessWords(vector<string> &vsWords, vector<string> &vsPermutations){
 						 case '1':
 								 vPrintWithIndex(vsCurrArr);
 								 viLinesToRemove = vRemoveLinesInMenu();
-								 // vRemoveLines(vsCurrArr, viLinesToRemove);
+								 vRemoveLines(vsCurrArr, viLinesToRemove);
 								 break;
 						 case '2':
 						 case '3':
 						 		vsAnswer.clear();
-								 vProcessWords(vsCurrArr, vsAnswer);
+								 vProcessWords(vsCurrArr, vsAnswer, vsStopWords);
 								 if(cOption == '2') {
 								     vSort(vsAnswer, ASC);
 								 } else {
 								     vSort(vsAnswer, DESC);
 								 }
 								 vPrintWithIndex(vsAnswer);
+								 // We ask if the user wants to remove a line from the output
 								 viLinesToRemove = vRemoveLinesInMenu();
-								 // vRemoveLines(vAnser, viLinesToRemove);
+								 vRemoveLines(vsAnswer, viLinesToRemove);
+								 cout << "<<<< These will be saved to output.txt. Please wait <<<<" << std::endl;
+								 vSaveToFile("output.txt", vsAnswer);
+								 cout << ">>>> These lines were saved to output.txt >>>>" << endl;
 								 break;
 						 case '4':
 								 // Reset current array to file from index
@@ -190,28 +280,15 @@ void vProcessWords(vector<string> &vsWords, vector<string> &vsPermutations){
 				 }
 		 } while (cOption != '5');
  }
+
  
  int main() {
-		 ifstream fileInput("input.txt");
-		 ofstream fileOutput("output.txt");
-		 vector<string> answer;
-		 vector<string> originalLines;
-		 
-		 string sLine;
-		 while(getline(fileInput, sLine)) {
-				 originalLines.push_back(sLine);
-		 }
-		 
-		 // vRemoveStopWords
-		 vMenu(originalLines, answer);
-		 
-		 // Outputs solution
-		 FOR(i, 0, answer.size()){
-				 fileOutput << answer[i] << endl;
-		 }
-		 
-		 fileInput.close();
-		 fileOutput.close();
+		 vector<string> vsAnswer;
+		 vector<string> vsOriginalLines;
+		 vector<string> vsStopWords;
+		 vReadFromFile("stopwords.txt", vsStopWords);
+		 vReadFromFile("input.txt", vsOriginalLines);
+		 vMenu(vsOriginalLines,vsStopWords,vsAnswer);
 		 return 0;
  }
  

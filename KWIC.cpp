@@ -26,6 +26,13 @@
 		 DESC
  };
  
+/** vReadFromFile
+ 	Method that recieves file name and destination vector to store all lines 
+ 	Removes the Carrage-Return character at the end of all the lines and then the lines are pushed
+  .
+	@param sFileName Recieves the name of the fail to open
+	@param vsLines String vector that stores the lines of the file
+ **/ 
 void vReadFromFile(string sFileName, vector<string> &vsLines){
 	ifstream file(sFileName);
 	string sLine;
@@ -39,7 +46,12 @@ void vReadFromFile(string sFileName, vector<string> &vsLines){
 	file.close();
 }
 
-/**
+/** sProcessLine
+	
+	Method called to save in a file the conents of a vector
+	
+	@@param sFileName Recieves the name of the fail to open to write
+	@param vsAnswer String vector provides the lines to be written
 */
 void vSaveToFile(string sFileName, vector<string> &vsAnswer){
 	ofstream fileOutput(sFileName);
@@ -134,6 +146,13 @@ void vSort(vector<string> &vsWords, SortOrder soOrder){
 	}
 }
 
+/** vRemoveBreakWords
+	  
+ 	Method that recieves a vector of Words and filters the BreakWords(stopWords) of a vector 
+	
+	@param vsWords passed by reference, vector of words of a line to filter
+	@param vsBreakWords vector passed by reference to get all the stop words to be removed
+*/
 void vRemoveBreakWords(vector<string> &vsWords, vector<string> &vsBreakWords){
 	vector<string> *vsFilteredWords = new vector<string>();
 	bool bIsWordABreakWord = false;
@@ -168,7 +187,8 @@ void vRemoveBreakWords(vector<string> &vsWords, vector<string> &vsBreakWords){
 	@param vsPermutations passed by reference, the vector with the permutations
 	@param vsStopWords passed by reference, the vector with the stop words
 */
-void vProcessWords(vector<string> &vsWords, vector<string> &vsPermutations,
+
+ void vProcessWords(vector<string> &vsWords, vector<string> &vsPermutations,
 				   vector<string> &vsStopWords){
 	FOR(i, 0, vsWords.size()){
 		string sNewLine = sProcessLine(vsWords[i]);
@@ -179,6 +199,14 @@ void vProcessWords(vector<string> &vsWords, vector<string> &vsPermutations,
 	}
 }
 
+/** vRemoveLines
+	  
+ 	Method recives a Words vector, to filter and remove the lines of the indexes from 
+ 	the LinesToRemove vector
+	
+	@param vsWords passed by reference, vector of words of a line to filter
+	@param viLinesToRemove indexes of the lines to delete
+*/
 void vRemoveLines(vector<string> &vsWords, vector<int> &viLinesToRemove){
 	if (viLinesToRemove.empty()){
 		return;
@@ -206,7 +234,7 @@ void vRemoveLines(vector<string> &vsWords, vector<int> &viLinesToRemove){
 		 vRemoveLinesInMenu
 		 Reads in GUI the indexes from the lines to remove
  
-		 @return 
+		 @return int Vector of the indexes to be removed
  */
  vector<int> vRemoveLinesInMenu() {
 		 cout << "Which lines do you want to remove?" << endl;

@@ -39,6 +39,8 @@ void vReadFromFile(string sFileName, vector<string> &vsLines){
 	file.close();
 }
 
+/**
+*/
 void vSaveToFile(string sFileName, vector<string> &vsAnswer){
 	ofstream fileOutput(sFileName);
 	// Outputs solution

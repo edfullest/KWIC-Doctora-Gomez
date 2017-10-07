@@ -30,7 +30,7 @@
  	Method that recieves file name and destination vector to store all lines 
  	Removes the Carrage-Return character at the end of all the lines and then the lines are pushed
   .
-	@param sFileName Recieves the name of the fail to open
+	@param sFileName Recieves the name of the file to open
 	@param vsLines String vector that stores the lines of the file
  **/ 
 void vReadFromFile(string sFileName, vector<string> &vsLines){
@@ -50,7 +50,7 @@ void vReadFromFile(string sFileName, vector<string> &vsLines){
 	
 	Method called to save in a file the conents of a vector
 	
-	@@param sFileName Recieves the name of the fail to open to write
+	@@param sFileName Recieves the name of the file to open to write
 	@param vsAnswer String vector provides the lines to be written
 */
 void vSaveToFile(string sFileName, vector<string> &vsAnswer){
@@ -134,7 +134,7 @@ void vSaveToFile(string sFileName, vector<string> &vsAnswer){
  	Method that sorts depending on the specification. It can be descending or ascending order.
  	It's important to note that the sorting is done in place, due to the passing by reference
 
-	@param vsWords passed by reference, vector of words of a line
+	@param vsWords passed by reference, vector with the lines
 */
 
 void vSort(vector<string> &vsWords, SortOrder soOrder){
@@ -181,7 +181,6 @@ void vRemoveBreakWords(vector<string> &vsWords, vector<string> &vsBreakWords){
 	2. Breaks the line into vector of single words
 	3. Removes the stop words from each line
 	4. Generates the permutation
-	.generates the permutations from a list of words
 
 	@param vsWords passed by reference, the vector of words that will be permuted
 	@param vsPermutations passed by reference, the vector with the permutations

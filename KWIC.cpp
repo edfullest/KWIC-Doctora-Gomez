@@ -134,15 +134,15 @@ void vSaveToFile(string sFileName, vector<string> &vsAnswer){
  	Method that sorts depending on the specification. It can be descending or ascending order.
  	It's important to note that the sorting is done in place, due to the passing by reference
 
-	@param vsWords passed by reference, vector with the lines
+	@param vsLines passed by reference, a vector with the lines to sort
 */
 
-void vSort(vector<string> &vsWords, SortOrder soOrder){
+void vSort(vector<string> &vsLines, SortOrder soOrder){
 	if (soOrder == ASC){
-		sort(vsWords.begin(), vsWords.end(), less<string>());
+		sort(vsLines.begin(), vsLines.end(), less<string>());
 	}
 	else{
-		sort(vsWords.begin(), vsWords.end(), greater<string>());
+		sort(vsLines.begin(), vsLines.end(), greater<string>());
 	}
 }
 
@@ -182,15 +182,15 @@ void vRemoveBreakWords(vector<string> &vsWords, vector<string> &vsBreakWords){
 	3. Removes the stop words from each line
 	4. Generates the permutation
 
-	@param vsWords passed by reference, the vector of words that will be permuted
+	@param vsLines passed by reference, the vector of lines that will be permuted
 	@param vsPermutations passed by reference, the vector with the permutations
 	@param vsStopWords passed by reference, the vector with the stop words
 */
 
- void vProcessWords(vector<string> &vsWords, vector<string> &vsPermutations,
+ void vProcessWords(vector<string> &vsLines, vector<string> &vsPermutations,
 				   vector<string> &vsStopWords){
-	FOR(i, 0, vsWords.size()){
-		string sNewLine = sProcessLine(vsWords[i]);
+	FOR(i, 0, vsLines.size()){
+		string sNewLine = sProcessLine(vsLines[i]);
 		vector<string> vsBrokenWords = vsBreakALine(sNewLine);
 
 		vRemoveBreakWords(vsBrokenWords, vsStopWords);
@@ -200,13 +200,13 @@ void vRemoveBreakWords(vector<string> &vsWords, vector<string> &vsBreakWords){
 
 /** vRemoveLines
 	  
- 	Method recives a Words vector, to filter and remove the lines of the indexes from 
+ 	Method recives a lines vector, to filter and remove the lines of the indexes from 
  	the LinesToRemove vector
 	
-	@param vsWords passed by reference, vector of words of a line to filter
+	@param vsLines passed by reference, vector of lines to filter
 	@param viLinesToRemove indexes of the lines to delete
 */
-void vRemoveLines(vector<string> &vsWords, vector<int> &viLinesToRemove){
+void vRemoveLines(vector<string> &vsLines, vector<int> &viLinesToRemove){
 	if (viLinesToRemove.empty()){
 		return;
 	}
@@ -214,16 +214,16 @@ void vRemoveLines(vector<string> &vsWords, vector<int> &viLinesToRemove){
 		vector<string> *vsFilteredLines = new vector<string>();
 		sort(viLinesToRemove.begin(), viLinesToRemove.end());
 		vector<int>::iterator itNextToRemove = viLinesToRemove.begin();
-		FOR(i, 0, vsWords.size()){
+		FOR(i, 0, vsLines.size()){
 			if (i == *itNextToRemove){
 				++itNextToRemove;
 			}
 			else{
-				vsFilteredLines -> push_back(vsWords[i]);
+				vsFilteredLines -> push_back(vsLines[i]);
 			}
 		}
-		vsWords.swap(*vsFilteredLines);
-		vPrintWithIndex(vsWords);
+		vsLines.swap(*vsFilteredLines);
+		vPrintWithIndex(vsLines);
 		delete vsFilteredLines;
 	}	
 }
